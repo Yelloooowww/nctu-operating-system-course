@@ -1,4 +1,6 @@
 // compile: $ gcc multiprocess.c
+// run: $ ./a.out datasize process_num
+// (datasize<99999999, process_num<256)
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -6,6 +8,10 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <inttypes.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <math.h>
 
 #define INF 99999999
 
@@ -14,11 +20,23 @@ u_int64_t ans = 0;
 u_int8_t buffer[INF];
 u_int8_t integer = 13;
 
+u_int64_t char2int(char *c_input){
+  u_int64_t tmp = 0;
+  for(long unsigned int i=0;i<strlen(c_input);i++){
+    u_int64_t decimal = 1;
+    u_int64_t each_digi = (int)(c_input[i] - '0');
+    for(long unsigned int j=0;j<strlen(c_input)-i-1;j++) decimal*=10;
+    tmp += each_digi*decimal;
+  }
+  return tmp;
+}
 
-int main(){
-  // prepare data
-  u_int64_t datasize = 9999999+1;
-  u_int8_t process_num = 1;
+// 主程式
+int main(int argc, char *argv[]) {
+  //prepare data
+  u_int64_t datasize = char2int(argv[1]);
+  u_int8_t process_num = char2int(argv[2]);
+  printf("test setting: datasize=%lu, process_num=%d \n",datasize,process_num);
 
   for(u_int64_t i=0;i<datasize;i++) buffer[i] = rand();
 
