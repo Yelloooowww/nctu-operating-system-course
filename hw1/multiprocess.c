@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
   for(int test_time=0;test_time<10;test_time++){
     ans = 0;
     int status;
-    pid_t pid;
+    pid_t pid[process_num];
 
 
     // calculate time cost
@@ -44,11 +44,10 @@ int main(int argc, char *argv[]) {
 
     // child process
     for(u_int8_t i=0;i<process_num;i++){
-      if ((pid = fork()) == -1) {
-        // perror("fork error");
+      if ((pid[i] = fork()) == -1) {
         exit(EXIT_FAILURE);
       }
-      else if (pid == 0) {//start of child process
+      else if (pid[i] == 0) {//start of child process
         u_int8_t count = 0;
         u_int64_t index_start = (datasize/process_num)*i;
         u_int64_t index_end;
@@ -57,24 +56,23 @@ int main(int argc, char *argv[]) {
 
         for(u_int64_t j=index_start;j<index_end;j++){
           if (buffer[j]==integer) count++;
+          // printf("%d %d %d\n", index_start,index_end,j);
         }
         exit(count);
       }
     }
-    
+
     for(u_int8_t i=0;i<process_num;i++){//start of parent process
-      if ((pid = wait(&status)) == -1) ; //Wait for child process.
+      if ((pid[i] = wait(&status)) == -1) ; //Wait for child process.
         // perror("wait error");
-      else { //Check status.
+      else if ((pid[i] = wait(&status)) != 0) { //Check status.
         if (WIFSIGNALED(status) != 0) ;
           // printf("Child process ended because of signal %d \n",WTERMSIG(status));
 
         else if (WIFEXITED(status) != 0){
           ans += WEXITSTATUS(status); //WEXITSTATUS 是一個巨集 (macro) , 他可以用來提取出指定的子程序結束狀態值
           // printf("Child process ended normally; status = %d \n",WEXITSTATUS(status));
-          // printf("Integer 13 occurs %ld times in the array\n", ans );
         }
-
         // else printf("Child process did not end normally \n");
       }
     }

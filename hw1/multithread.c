@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
   //prepare data
   u_int64_t datasize = atoi(argv[1]);
   u_int8_t process_num = atoi(argv[2]);
-  printf("test setting: datasize=%lu, process_num=%d \n",datasize,process_num);
+  printf("test setting: datasize=%lu, thread_num=%d \n",datasize,process_num);
 
   for(u_int64_t i=0;i<datasize;i++) buffer[i] = rand();
   u_int64_t input[process_num][2];
