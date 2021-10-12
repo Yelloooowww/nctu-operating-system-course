@@ -26,32 +26,23 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 // 子執行緒函數
 void* child(void *arg) {
   u_int64_t *input = (u_int64_t *) arg; // 取得資料
+  u_int64_t local_ans = 0;
   for(u_int64_t j=input[0];j<input[1];j++){
-    if (buffer[j]==integer){
-      pthread_mutex_lock( &mutex ); // 上鎖
-      ans++;
-      pthread_mutex_unlock( &mutex ); // 解鎖
-    }
+    if (buffer[j]==integer) local_ans++;
   }
+
+  pthread_mutex_lock( &mutex ); // 上鎖
+  ans += local_ans;
+  pthread_mutex_unlock( &mutex ); // 解鎖
   pthread_exit(NULL);
 }
 
-u_int64_t char2int(char *c_input){
-  u_int64_t tmp = 0;
-  for(long unsigned int i=0;i<strlen(c_input);i++){
-    u_int64_t decimal = 1;
-    u_int64_t each_digi = (int)(c_input[i] - '0');
-    for(long unsigned int j=0;j<strlen(c_input)-i-1;j++) decimal*=10;
-    tmp += each_digi*decimal;
-  }
-  return tmp;
-}
 
 // 主程式
 int main(int argc, char *argv[]) {
   //prepare data
-  u_int64_t datasize = char2int(argv[1]);
-  u_int8_t process_num = char2int(argv[2]);
+  u_int64_t datasize = atoi(argv[1]);
+  u_int8_t process_num = atoi(argv[2]);
   printf("test setting: datasize=%lu, process_num=%d \n",datasize,process_num);
 
   for(u_int64_t i=0;i<datasize;i++) buffer[i] = rand();
