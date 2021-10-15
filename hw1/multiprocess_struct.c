@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#define INF 99999999
+#define INF 99999999+1
 typedef struct {
   u_int8_t a;
   u_int8_t b;
@@ -26,6 +26,10 @@ test_struct buffer[INF];
 
 // 主程式
 int main(int argc, char *argv[]) {
+  FILE *F ;
+  F = fopen("multiprocess_struct.csv","a");
+  if(F == NULL) printf("open file fail QQ\n");
+
   //prepare data
   u_int64_t datasize = atoi(argv[1]);
   u_int8_t process_num = atoi(argv[2]);
@@ -95,5 +99,8 @@ int main(int argc, char *argv[]) {
 
   long long int time_avg = time_sum/10;
   printf("average time cost is %lld ms\n",time_avg);
+  fprintf(F, "%lu, %d, %lld \n",datasize, process_num, time_avg);
+  fclose(F);
+
   return 0;
 }
