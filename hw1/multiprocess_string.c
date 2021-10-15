@@ -1,4 +1,4 @@
-// compile: $ gcc multiprocess.c
+// compile: $ gcc multiprocess_string.c
 // run: $ ./a.out datasize process_num
 // (datasize<99999999, process_num<256)
 #include <sys/types.h>
@@ -17,8 +17,8 @@
 
 
 u_int64_t ans = 0;
-u_int8_t buffer[INF];
-u_int8_t integer = 13;
+char buffer[INF][6];
+char string[6] = {'y','e','l','l','o','w'};
 
 // 主程式
 int main(int argc, char *argv[]) {
@@ -27,7 +27,9 @@ int main(int argc, char *argv[]) {
   u_int8_t process_num = atoi(argv[2]);
   printf("test setting: datasize=%lu, process_num=%d \n",datasize,process_num);
 
-  for(u_int64_t i=0;i<datasize;i++) buffer[i] = rand();
+  for(u_int64_t i=0;i<datasize;i++){
+    for(u_int64_t j=0;j<6;j++) buffer[i][j] = rand();//string[j];
+  }
 
   long long int time_sum = 0;
   for(int test_time=0;test_time<10;test_time++){
@@ -55,7 +57,14 @@ int main(int argc, char *argv[]) {
         else index_end = datasize;
 
         for(u_int64_t j=index_start;j<index_end;j++){
-          if (buffer[j]==integer) count++;
+          char flag = 1; //True
+          for(u_int64_t k=0;k<6;k++){
+            if(buffer[j][k]!=string[k]){
+              flag = 0; // the string != "yellow"
+              break;
+            }
+          }
+          if (flag==1) count++ ;
           // printf("%d %d %d\n", index_start,index_end,j);
         }
         exit(count);

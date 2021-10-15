@@ -1,4 +1,4 @@
-// compile: $ gcc multithread.c -lpthread
+// compile: $ gcc multithread_string.c -lpthread
 // run: $ ./a.out datasize process_num
 // (datasize<99999999, process_num<256)
 #include <stdio.h>
@@ -17,8 +17,8 @@
 
 
 u_int64_t ans = 0;
-u_int8_t buffer[INF];
-u_int8_t integer = 13;
+char buffer[INF][6];
+char string[6] = {'y','e','l','l','o','w'};
 
 // 加入 Mutex
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -28,7 +28,14 @@ void* child(void *arg) {
   u_int64_t *input = (u_int64_t *) arg; // 取得資料
   u_int64_t local_ans = 0;
   for(u_int64_t j=input[0];j<input[1];j++){
-    if (buffer[j]==integer) local_ans++;
+    char flag = 1; //True
+    for(u_int64_t k=0;k<6;k++){
+      if(buffer[j][k]!=string[k]){
+        flag = 0; // the string != "yellow"
+        break;
+      }
+    }
+    if (flag==1) local_ans++;
   }
 
   pthread_mutex_lock( &mutex ); // 上鎖
@@ -45,7 +52,10 @@ int main(int argc, char *argv[]) {
   u_int8_t process_num = atoi(argv[2]);
   printf("test setting: datasize=%lu, thread_num=%d \n",datasize,process_num);
 
-  for(u_int64_t i=0;i<datasize;i++) buffer[i] = rand();
+  for(u_int64_t i=0;i<datasize;i++){
+    for(u_int64_t j=0;j<6;j++) buffer[i][j] = rand();//string[j];
+  }
+
   u_int64_t input[process_num][2];
   for(u_int8_t i=0;i<process_num;i++){
     input[i][0] = (datasize/process_num)*i; //index_start
@@ -71,7 +81,7 @@ int main(int argc, char *argv[]) {
     }
 
 
-    for(u_int8_t i=0;i<process_num;i++) pthread_join(t[0], NULL);
+    for(u_int8_t i=0;i<process_num;i++) pthread_join(t[i], NULL);
 
     // calculate time cost
     gettimeofday(&end,NULL);
